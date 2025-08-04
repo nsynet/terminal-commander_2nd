@@ -33,7 +33,8 @@ namespace TerminalCommander {
   static const char strErrUndefinedUserFunctionPtr[] PROGMEM = "Error: USER function is not defined (null pointer)\n";
   static const char strErrUnrecognizedInput[] PROGMEM = "Error: Unrecognized Input Character\n";
   static const char strErrInvalidSerialCmdLength[] PROGMEM = "\nError: Serial Command Length Exceeds Limit\n";
-  static const char strErrIncomingTwoWireReadLength[] PROGMEM = "Error: Incoming TwoWire Data Exceeds Read Buffer\n";
+  static const char strErrTwoWireNack[] PROGMEM = "Error: I2C transaction attempt recieved NACK\n";
+  static const char strErrTwoWireReadLength[] PROGMEM = "Error: Incoming TwoWire Data Exceeds Read Buffer\n";
   static const char strErrInvalidTwoWireCharacter[] PROGMEM = "Error: Invalid TwoWire Command Character\n";
   static const char strErrInvalidTwoWireCmdLength[] PROGMEM = "Error: TwoWire Command requires Address and Register\n";
   static const char strErrInvalidTwoWireWriteData[] PROGMEM = "Error: No data provided for write to I2C registers\n";
@@ -47,8 +48,9 @@ namespace TerminalCommander {
     strErrNoInput, 
     strErrUndefinedUserFunctionPtr, 
     strErrUnrecognizedInput, 
-    strErrInvalidSerialCmdLength, 
-    strErrIncomingTwoWireReadLength,
+    strErrInvalidSerialCmdLength,
+    strErrTwoWireNack, 
+    strErrTwoWireReadLength,
     strErrInvalidTwoWireCharacter, 
     strErrInvalidTwoWireCmdLength, 
     strErrInvalidTwoWireWriteData, 
@@ -502,7 +504,7 @@ namespace TerminalCommander {
     this->pWire->write(i2c_register);
     twi_error_type_t error = (twi_error_type_t)(this->pWire->endTransmission());
     if (error == NACK_ADDRESS) {
-      this->pSerial->println(F("Error: I2C read attempt recieved NACK"));
+      this->lastError.set(TwoWireNack);
       return false;
     }
 
@@ -511,7 +513,7 @@ namespace TerminalCommander {
     delayMicroseconds(50U);
     while(this->pWire->available()) {
       if (twi_read_index >= TERM_TWOWIRE_BUFFER_SIZE) {
-        this->lastError.set(IncomingTwoWireReadLength);
+        this->lastError.set(TwoWireReadLength);
         return false;
       }
       this->command.twowire[twi_read_index] = (uint8_t)this->pWire->read();
@@ -563,7 +565,7 @@ namespace TerminalCommander {
     }
     twi_error_type_t error = (twi_error_type_t)(this->pWire->endTransmission());
     if (error == NACK_ADDRESS) {
-      this->pSerial->println(F("Error: I2C write attempt recieved NACK"));
+      this->lastError.set(TwoWireNack);
       return false;
     }
 
