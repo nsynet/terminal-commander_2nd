@@ -81,7 +81,7 @@
         InvalidTwoWireCmdLength, 
         InvalidTwoWireWriteData, 
         InvalidHexValuePair, 
-        UnrecognizedProtocol, 
+        UnrecognizedCommand, 
         UnrecognizedI2CTransType, 
       };
 

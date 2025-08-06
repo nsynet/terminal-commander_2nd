@@ -39,7 +39,7 @@ namespace TerminalCommander {
   static const char strErrInvalidTwoWireCmdLength[] PROGMEM = "Error: TwoWire Command requires Address and Register\n";
   static const char strErrInvalidTwoWireWriteData[] PROGMEM = "Error: No data provided for write to I2C registers\n";
   static const char strErrInvalidHexValuePair[] PROGMEM = "Error: Commands must be in hex value pairs\n";
-  static const char strErrUnrecognizedProtocol[] PROGMEM = "Error: Unrecognized Protocol\n";
+  static const char strErrUnrecognizedCommand[] PROGMEM = "Error: Unrecognized Command\n";
   static const char strErrUnrecognizedI2CTransType[] PROGMEM = "Error: Unrecognized I2C transaction type\n";
 
   const char *const Error::string_error_table[] PROGMEM = 
@@ -55,7 +55,7 @@ namespace TerminalCommander {
     strErrInvalidTwoWireCmdLength, 
     strErrInvalidTwoWireWriteData, 
     strErrInvalidHexValuePair, 
-    strErrUnrecognizedProtocol, 
+    strErrUnrecognizedCommand, 
     strErrUnrecognizedI2CTransType
   };
 
@@ -286,7 +286,7 @@ namespace TerminalCommander {
     }
 
     // no terminal commander or user-defined command was identified
-    this->lastError.set(UnrecognizedProtocol);
+    this->lastError.set(UnrecognizedCommand);
     return false;
   }
 
@@ -588,7 +588,7 @@ namespace TerminalCommander {
     // This command does not accept additional arguments
     if ((this->command.argsLength + this->command.cmdLength) > 4U) {
       /** TODO: this could be a warning instead of an error */
-      this->lastError.set(UnrecognizedProtocol);
+      this->lastError.set(UnrecognizedCommand);
       return false;
     }
 
