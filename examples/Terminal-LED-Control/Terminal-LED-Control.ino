@@ -36,6 +36,7 @@ void setup() {
   // Option2: using a pointer to a function that matches
   // type TerminalCommander::user_callback_char_fn_t
   Terminal.onCommand("MyCommand",      &my_function);
+  Terminal.onCommand("digitalWrite",   &digitalWrite_function);
   Terminal.onCommand("help",           &help_function);
 #ifdef FEATURE_ECHO
   Terminal.echo(true);
@@ -84,6 +85,21 @@ void my_function(struct cmd_param param) {
   Serial.println(param.argv[4]);
 }
 
+  
+void digitalWrite_function(struct cmd_param param) {
+  int val = 0;
+  
+  val = keyword2value(param.argv[1]);
+
+  if ((param.argc != 2) ||(val < 0))
+  {
+    Serial.println(F("Bad parameter,Example: digitalWrite 13  HIGH"));
+    return;
+  }
+  
+  digitalWrite(atoi(param.argv[0]), val);
+}
+
 
 void help_function(struct cmd_param param) {
   Serial.println("help:\n"
@@ -92,6 +108,7 @@ void help_function(struct cmd_param param) {
                 "scan           - i2c scan\n"
                 "i2c r          - i2c read\n"
                 "i2c w          - i2c write\n"
+                "digitalWrite   - digitalWrite pin, HIGH/LOW \n"
                 "help           - list command\n"
                 "MyCommand      - your test command\n"
                 "\n"
@@ -100,7 +117,8 @@ void help_function(struct cmd_param param) {
                 "  >>i2c r 31 02 00 00 00\n"
                 "* test your command\n"
                 "  >>MyCommand P1 P2 P3 P4 P5\n"
-                );
+                "* GPIO13 to HIGH\n"
+                "  >>digitalWrite 13  HIGH\n");
 }
 
 void loop() {
